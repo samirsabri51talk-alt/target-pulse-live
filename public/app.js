@@ -25,6 +25,7 @@ async function api(write = false) {
     newest = timestamp; remaining = state.remaining;
     const completed = TARGET - remaining;
     $('remaining').textContent = remaining;
+    $('orders-ar').textContent = remaining;
     $('progress-fill').style.width = `${completed / TARGET * 100}%`;
     document.querySelector('[role="progressbar"]').setAttribute('aria-valuenow', String(completed));
     $('progress-copy').textContent = remaining === 0 ? 'Target reached — incredible work, team!' : `${completed} of ${TARGET} contracts · ${Math.round(completed / TARGET * 100)}% complete`;
@@ -54,6 +55,7 @@ $('win-button').addEventListener('click', async () => {
     $('request-status').textContent = '';
     $('celebration').classList.add('show'); clearTimeout(toastTimer);
     toastTimer = setTimeout(() => $('celebration').classList.remove('show'), 3500);
+    launchFireworks();
   } catch (error) { $('request-status').textContent = error.message; }
   finally { busy = false; $('win-button').disabled = remaining === 0; }
 });
@@ -75,3 +77,27 @@ sync(); clock();
 setInterval(sync, 2000); setInterval(clock, 1000);
 window.addEventListener('online', sync);
 document.addEventListener('visibilitychange', () => { if (!document.hidden) { sync(); clock(); } });
+
+// Keep the original quick keyboard controls, with local-only adjustment until a cloud counter is configured.
+document.addEventListener('keydown', event => {
+  if (event.target instanceof HTMLInputElement || event.target instanceof HTMLTextAreaElement) return;
+  if (event.key === 'ArrowDown' || event.key === 'ArrowUp') {
+    event.preventDefault();
+    if (remaining === null) return;
+    remaining = Math.max(0, remaining + (event.key === 'ArrowUp' ? 1 : -1));
+    $('remaining').textContent = remaining; $('orders-ar').textContent = remaining;
+  }
+  if (event.key === ' ' || event.key === 'Enter') { event.preventDefault(); if (!busy) $('win-button').click(); }
+});
+
+const canvas = $('fx'), context = canvas.getContext('2d'); let particles = [];
+function resizeCanvas() { canvas.width = innerWidth; canvas.height = innerHeight; }
+function launchFireworks() {
+  for (let burst = 0; burst < 4; burst++) setTimeout(() => {
+    const x = canvas.width * (.2 + Math.random() * .6), y = canvas.height * (.16 + Math.random() * .32);
+    for (let i = 0; i < 45; i++) { const angle = Math.PI * 2 * i / 45; const speed = 2 + Math.random() * 4;
+      particles.push({ x, y, vx: Math.cos(angle) * speed, vy: Math.sin(angle) * speed, age: 0, life: 55 + Math.random() * 25, color: ['#ffd84d','#fff','#67e5df','#ffef9a'][i % 4] }); }
+  }, burst * 220);
+}
+function animate() { context.clearRect(0, 0, canvas.width, canvas.height); particles = particles.filter(p => p.age++ < p.life); for (const p of particles) { p.x += p.vx; p.y += p.vy; p.vy += .05; context.globalAlpha = 1 - p.age / p.life; context.fillStyle = p.color; context.fillRect(p.x, p.y, 3, 3); } context.globalAlpha = 1; requestAnimationFrame(animate); }
+resizeCanvas(); addEventListener('resize', resizeCanvas); animate();
