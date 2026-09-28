@@ -1,0 +1,53 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="theme-color" content="#07162d" />
+    <meta name="description" content="A live, shared countdown to the team's next target." />
+    <title>Target Pulse — Live Countdown</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <main class="shell">
+      <nav class="topbar" aria-label="Page information">
+        <a class="brand" href="./" aria-label="Target Pulse home"><span class="brand-mark">↗</span> 51TALK · TARGET PULSE</a>
+        <div class="live-status"><span class="live-dot"></span><span id="sync-label">LIVE · syncing</span></div>
+      </nav>
+
+      <section class="hero" aria-labelledby="heading">
+        <p class="eyebrow">TODAY'S SHARED GOAL</p>
+        <h1 id="heading">Every win moves<br />the team forward.</h1>
+        <p class="intro">A live view of the remaining contracts. It refreshes automatically, so everyone sees the same momentum.</p>
+      </section>
+
+      <section class="dashboard" aria-label="Live target dashboard">
+        <div class="counter-card">
+          <div class="card-head"><p>CONTRACTS TO GO</p><span id="updated-time" aria-live="polite">Loading…</span></div>
+          <div class="counter"><span id="remaining" aria-live="polite">—</span><span>left</span></div>
+          <div class="progress-track" role="progressbar" aria-label="Target progress" aria-valuemin="0" aria-valuemax="165" aria-valuenow="0"><span id="progress-fill"></span></div>
+          <p id="progress-copy" class="progress-copy">Preparing the live total…</p>
+          <button id="win-button" class="win-button" type="button" disabled><span>+</span> Record a contract</button>
+          <p id="request-status" class="request-status" role="status"></p>
+        </div>
+
+        <div class="time-card">
+          <p class="card-label">TIME LEFT TODAY</p>
+          <div class="clock" aria-label="Countdown to midnight">
+            <div><strong id="hours">00</strong><span>hours</span></div><i>:</i>
+            <div><strong id="minutes">00</strong><span>minutes</span></div><i>:</i>
+            <div><strong id="seconds">00</strong><span>seconds</span></div>
+          </div>
+          <div class="time-note"><span>●</span> Target window closes at midnight, local time.</div>
+        </div>
+      </section>
+
+      <aside id="celebration" class="celebration" aria-live="assertive" aria-atomic="true"><span>✦</span><div><strong>Contract recorded!</strong><small>The live total has been updated.</small></div></aside>
+      <footer>ONE TEAM · ONE GOAL <span aria-hidden="true">/</span> Live data updates every 2 seconds</footer>
+    </main>
+    <script src="app.js" type="module"></script>
+  </body>
+</html>
