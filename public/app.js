@@ -54,7 +54,9 @@ $('win-button').addEventListener('click', async () => {
     await api(true); requestId = undefined;
     $('request-status').textContent = '';
     $('celebration').classList.add('show'); clearTimeout(toastTimer);
+    document.querySelector('.mascot')?.classList.add('celebrate');
     toastTimer = setTimeout(() => $('celebration').classList.remove('show'), 3500);
+    setTimeout(() => document.querySelector('.mascot')?.classList.remove('celebrate'), 3600);
     launchFireworks();
   } catch (error) { $('request-status').textContent = error.message; }
   finally { busy = false; $('win-button').disabled = remaining === 0; }
@@ -90,14 +92,11 @@ document.addEventListener('keydown', event => {
   if (event.key === ' ' || event.key === 'Enter') { event.preventDefault(); if (!busy) $('win-button').click(); }
 });
 
-const canvas = $('fx'), context = canvas.getContext('2d'); let particles = [];
+const canvas = $('fx'), context = canvas.getContext('2d'); let particles = [], rockets = [];
 function resizeCanvas() { canvas.width = innerWidth; canvas.height = innerHeight; }
 function launchFireworks() {
-  for (let burst = 0; burst < 4; burst++) setTimeout(() => {
-    const x = canvas.width * (.2 + Math.random() * .6), y = canvas.height * (.16 + Math.random() * .32);
-    for (let i = 0; i < 45; i++) { const angle = Math.PI * 2 * i / 45; const speed = 2 + Math.random() * 4;
-      particles.push({ x, y, vx: Math.cos(angle) * speed, vy: Math.sin(angle) * speed, age: 0, life: 55 + Math.random() * 25, color: ['#ffd84d','#fff','#67e5df','#ffef9a'][i % 4] }); }
-  }, burst * 220);
+  for (let burst = 0; burst < 5; burst++) setTimeout(() => rockets.push({ x: canvas.width * (.18 + Math.random() * .64), y: canvas.height + 10, target: canvas.height * (.13 + Math.random() * .34), speed: 8 + Math.random() * 2, color: ['#ffd84d','#fff','#67e5df','#ffef9a','#ff9481'][burst] }), burst * 220);
 }
-function animate() { context.clearRect(0, 0, canvas.width, canvas.height); particles = particles.filter(p => p.age++ < p.life); for (const p of particles) { p.x += p.vx; p.y += p.vy; p.vy += .05; context.globalAlpha = 1 - p.age / p.life; context.fillStyle = p.color; context.fillRect(p.x, p.y, 3, 3); } context.globalAlpha = 1; requestAnimationFrame(animate); }
+function explode(rocket) { for (let i = 0; i < 95; i++) { const angle = Math.PI * 2 * i / 95 + Math.random() * .1; const speed = 1.5 + Math.random() * 5.8; particles.push({ x: rocket.x, y: rocket.y, px: rocket.x, py: rocket.y, vx: Math.cos(angle) * speed, vy: Math.sin(angle) * speed, age: 0, life: 55 + Math.random() * 38, color: rocket.color, size: 1 + Math.random() * 2.4 }); } }
+function animate() { context.clearRect(0, 0, canvas.width, canvas.height); context.globalCompositeOperation = 'lighter'; for (const rocket of rockets) { rocket.y -= rocket.speed; rocket.speed *= .985; context.fillStyle = rocket.color; context.globalAlpha = .9; context.beginPath(); context.arc(rocket.x, rocket.y, 2.5, 0, Math.PI * 2); context.fill(); if (Math.random() < .7) particles.push({ x: rocket.x, y: rocket.y, px: rocket.x, py: rocket.y + 8, vx: 0, vy: 1, age: 0, life: 18, color: rocket.color, size: 1.3 }); if (rocket.y <= rocket.target) { explode(rocket); rockets = rockets.filter(item => item !== rocket); } } particles = particles.filter(p => p.age++ < p.life); for (const p of particles) { p.px = p.x; p.py = p.y; p.x += p.vx; p.y += p.vy; p.vy += .055; p.vx *= .988; context.globalAlpha = Math.max(0, 1 - p.age / p.life); context.strokeStyle = p.color; context.lineWidth = p.size; context.beginPath(); context.moveTo(p.px, p.py); context.lineTo(p.x, p.y); context.stroke(); } context.globalAlpha = 1; context.globalCompositeOperation = 'source-over'; requestAnimationFrame(animate); }
 resizeCanvas(); addEventListener('resize', resizeCanvas); animate();

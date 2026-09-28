@@ -4,16 +4,16 @@
   <meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
   <meta name="theme-color" content="#06133b"><title>51Talk · Target Celebration</title>
   <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Manrope:wght@500;600;700;800&display=swap" rel="stylesheet"><link rel="stylesheet" href="styles.css">
+  <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Manrope:wght@500;600;700;800&display=swap" rel="stylesheet"><link rel="stylesheet" href="styles.css"><link rel="stylesheet" href="brand-overrides.css">
 </head>
 <body>
   <canvas id="fx" aria-hidden="true"></canvas>
   <main class="stage">
-    <header class="header-row"><a class="brand" href="./"><span class="brand-mark">↗</span><span>51TALK</span></a><div class="badge">ONE TEAM · ONE GOAL</div><div class="live-status"><span class="live-dot"></span><span id="sync-label">LIVE · syncing</span></div></header>
+    <header class="header-row"><a class="brand" href="./"><img src="logo.png" alt="51Talk"><span class="brand-word">TARGET PULSE</span></a><div class="badge">ONE TEAM · ONE GOAL</div><div class="live-status"><span class="live-dot"></span><span id="sync-label">LIVE · syncing</span></div></header>
     <section class="hero" aria-labelledby="title">
       <p class="hero-label">TODAY'S TARGET · 100%</p><h1 id="title">Every win moves<br><em>the team forward.</em></h1>
       <div class="number-wrap"><span id="remaining" class="big-number" aria-live="polite">—</span><span class="number-caption">CONTRACTS TO GO</span></div>
-      <div class="mascot" aria-hidden="true"><div class="mascot-hat">★</div><div class="mascot-face"><span>• •</span><b>⌣</b></div><div class="mascot-body">51</div></div>
+      <img class="mascot" src="mascot.png" alt="" aria-hidden="true">
       <div class="progress-track" role="progressbar" aria-label="Target progress" aria-valuemin="0" aria-valuemax="165" aria-valuenow="0"><span id="progress-fill"></span></div><p id="progress-copy" class="progress-copy">Preparing the live total…</p>
     </section>
     <section class="lower-grid">
