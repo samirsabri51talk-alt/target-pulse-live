@@ -23,6 +23,7 @@ async function api(write = false) {
   const target = state?.target ?? 165;
   if (!state || !Number.isInteger(target) || target < 1 || !Number.isInteger(state.remaining) || state.remaining < 0 || state.remaining > target || !Number.isFinite(timestamp)) throw new Error('The live service returned invalid data.');
   if (timestamp >= newest) {
+    const celebrateRemote = !write && remaining !== null && target === TARGET && state.remaining < remaining;
     newest = timestamp; remaining = state.remaining; TARGET = target;
     const completed = TARGET - remaining;
     $('remaining').textContent = remaining;
@@ -32,6 +33,7 @@ async function api(write = false) {
     document.querySelector('[role="progressbar"]').setAttribute('aria-valuemax', String(TARGET));
     $('progress-copy').textContent = remaining === 0 ? 'Target reached — incredible work, team!' : `${completed} of ${TARGET} contracts · ${Math.round(completed / TARGET * 100)}% complete`;
     $('updated-time').textContent = `Updated ${formatter.format(timestamp)}`;
+    if (celebrateRemote) celebrate();
   }
   $('sync-label').textContent = 'LIVE · synced';
   document.querySelector('.live-dot').style.background = 'var(--cyan)';
@@ -55,11 +57,7 @@ $('win-button').addEventListener('click', async () => {
   try {
     await api(true); requestId = undefined;
     $('request-status').textContent = '';
-    $('celebration').classList.add('show'); clearTimeout(toastTimer);
-    document.querySelector('.mascot')?.classList.add('celebrate');
-    toastTimer = setTimeout(() => $('celebration').classList.remove('show'), 3500);
-    setTimeout(() => document.querySelector('.mascot')?.classList.remove('celebrate'), 3600);
-    launchFireworks();
+    celebrate();
   } catch (error) { $('request-status').textContent = error.message; }
   finally { busy = false; $('win-button').disabled = remaining === 0; }
 });
@@ -97,8 +95,16 @@ document.addEventListener('keydown', event => {
 const canvas = $('fx'), context = canvas.getContext('2d'); let particles = [], rockets = [];
 function resizeCanvas() { canvas.width = innerWidth; canvas.height = innerHeight; }
 function launchFireworks() {
+  if (matchMedia('(prefers-reduced-motion: reduce)').matches) return;
   for (let burst = 0; burst < 5; burst++) setTimeout(() => rockets.push({ x: canvas.width * (.18 + Math.random() * .64), y: canvas.height + 10, target: canvas.height * (.13 + Math.random() * .34), speed: 8 + Math.random() * 2, color: ['#ffd84d','#fff','#67e5df','#ffef9a','#ff9481'][burst] }), burst * 220);
 }
+function celebrate() {
+  $('celebration').classList.add('show'); clearTimeout(toastTimer);
+  document.querySelector('.mascot')?.classList.add('celebrate');
+  toastTimer = setTimeout(() => { $('celebration').classList.remove('show'); document.querySelector('.mascot')?.classList.remove('celebrate'); }, 3600);
+  launchFireworks();
+}
+$('preview-fireworks')?.addEventListener('click', () => { launchFireworks(); document.querySelector('.mascot')?.classList.add('celebrate'); setTimeout(()=>document.querySelector('.mascot')?.classList.remove('celebrate'),3600); });
 function explode(rocket) { for (let i = 0; i < 95; i++) { const angle = Math.PI * 2 * i / 95 + Math.random() * .1; const speed = 1.5 + Math.random() * 5.8; particles.push({ x: rocket.x, y: rocket.y, px: rocket.x, py: rocket.y, vx: Math.cos(angle) * speed, vy: Math.sin(angle) * speed, age: 0, life: 55 + Math.random() * 38, color: rocket.color, size: 1 + Math.random() * 2.4 }); } }
-function animate() { context.clearRect(0, 0, canvas.width, canvas.height); context.globalCompositeOperation = 'lighter'; for (const rocket of rockets) { rocket.y -= rocket.speed; rocket.speed *= .985; context.fillStyle = rocket.color; context.globalAlpha = .9; context.beginPath(); context.arc(rocket.x, rocket.y, 2.5, 0, Math.PI * 2); context.fill(); if (Math.random() < .7) particles.push({ x: rocket.x, y: rocket.y, px: rocket.x, py: rocket.y + 8, vx: 0, vy: 1, age: 0, life: 18, color: rocket.color, size: 1.3 }); if (rocket.y <= rocket.target) { explode(rocket); rockets = rockets.filter(item => item !== rocket); } } particles = particles.filter(p => p.age++ < p.life); for (const p of particles) { p.px = p.x; p.py = p.y; p.x += p.vx; p.y += p.vy; p.vy += .055; p.vx *= .988; context.globalAlpha = Math.max(0, 1 - p.age / p.life); context.strokeStyle = p.color; context.lineWidth = p.size; context.beginPath(); context.moveTo(p.px, p.py); context.lineTo(p.x, p.y); context.stroke(); } context.globalAlpha = 1; context.globalCompositeOperation = 'source-over'; requestAnimationFrame(animate); }
+function animate() { context.clearRect(0, 0, canvas.width, canvas.height); context.globalCompositeOperation = 'lighter'; for (const rocket of rockets) { rocket.y -= rocket.speed; rocket.speed = Math.max(4, rocket.speed * .985); context.fillStyle = rocket.color; context.globalAlpha = .9; context.beginPath(); context.arc(rocket.x, rocket.y, 2.5, 0, Math.PI * 2); context.fill(); if (Math.random() < .7) particles.push({ x: rocket.x, y: rocket.y, px: rocket.x, py: rocket.y + 8, vx: 0, vy: 1, age: 0, life: 18, color: rocket.color, size: 1.3 }); if (rocket.y <= rocket.target) { explode(rocket); rockets = rockets.filter(item => item !== rocket); } } particles = particles.filter(p => p.age++ < p.life); for (const p of particles) { p.px = p.x; p.py = p.y; p.x += p.vx; p.y += p.vy; p.vy += .055; p.vx *= .988; context.globalAlpha = Math.max(0, 1 - p.age / p.life); context.strokeStyle = p.color; context.lineWidth = p.size; context.beginPath(); context.moveTo(p.px, p.py); context.lineTo(p.x, p.y); context.stroke(); } context.globalAlpha = 1; context.globalCompositeOperation = 'source-over'; requestAnimationFrame(animate); }
 resizeCanvas(); addEventListener('resize', resizeCanvas); animate();
