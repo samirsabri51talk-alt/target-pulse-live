@@ -1,8 +1,9 @@
 <!doctype html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
 
   <meta name="theme-color" content="#06133b">
   <title>51Talk · Target Celebration</title>
@@ -21,12 +22,11 @@
 
 <body>
 
-  <!-- Fireworks canvas -->
+  <!-- FIREWORKS -->
   <canvas id="fx" aria-hidden="true"></canvas>
 
   <main class="stage">
 
-    <!-- HEADER -->
     <header class="header-row">
 
       <a class="brand" href="./">
@@ -46,7 +46,6 @@
     </header>
 
 
-    <!-- HERO -->
     <section class="hero" aria-labelledby="title">
 
       <p class="hero-label">
@@ -59,15 +58,19 @@
       </h1>
 
       <div class="number-wrap">
+
         <span
           id="remaining"
           class="big-number"
           aria-live="polite"
-        >—</span>
+        >
+          —
+        </span>
 
         <span class="number-caption">
           CONTRACTS TO GO
         </span>
+
       </div>
 
       <img
@@ -98,17 +101,13 @@
     </section>
 
 
-    <!-- LOWER SECTION -->
     <section class="lower-grid">
 
-      <!-- COUNTDOWN -->
       <div class="panel countdown-panel">
 
         <div class="panel-label">
           TIME LEFT TODAY
-          <span id="updated-time">
-            Loading…
-          </span>
+          <span id="updated-time">Loading…</span>
         </div>
 
         <div class="countdown-box">
@@ -141,7 +140,6 @@
       </div>
 
 
-      <!-- TARGET STATUS -->
       <div class="panel action-panel">
 
         <p class="arabic" dir="rtl">
@@ -150,22 +148,9 @@
           طلبًا للوصول إلى 100%
         </p>
 
-        <!--
-          KEEP THIS ELEMENT.
-          app.js may depend on #win-button.
-          It is hidden from users.
-        -->
-        <button
-          id="win-button"
-          class="win-button"
-          type="button"
-          disabled
-          hidden
-          aria-hidden="true"
-          tabindex="-1"
-        >
-          🏆 We Got a Contract!
-        </button>
+        <p class="hint">
+          Every contract counts. Let's reach the goal together.
+        </p>
 
         <p
           id="request-status"
@@ -173,37 +158,44 @@
           role="status"
         ></p>
 
-        <p class="hint">
-          Every contract counts. Let's reach the goal together.
-        </p>
-
       </div>
 
     </section>
 
 
-    <!-- FIREWORKS PREVIEW -->
-    <div style="text-align:center; margin-top:18px;">
+    <!-- GLOBAL CELEBRATION BUTTON -->
+    <div
+      class="fireworks-control"
+      style="
+        text-align:center;
+        margin-top:22px;
+      "
+    >
 
       <button
         id="preview-fireworks"
         type="button"
         style="
-          background:transparent;
-          color:var(--gold-soft);
-          border:1px solid var(--line);
-          border-radius:20px;
-          padding:10px 18px;
+          background:linear-gradient(135deg,#ffcc55,#ff8a3d);
+          color:#06133b;
+          border:0;
+          border-radius:30px;
+          padding:14px 28px;
           cursor:pointer;
+          font-family:Manrope,sans-serif;
+          font-size:15px;
+          font-weight:800;
+          letter-spacing:.04em;
+          box-shadow:0 8px 30px rgba(255,180,60,.25);
+          transition:transform .2s ease,box-shadow .2s ease;
         "
       >
-        ✨ Preview fireworks
+        🎆 CELEBRATE NOW
       </button>
 
     </div>
 
 
-    <!-- FOOTER -->
     <footer>
       Live data refreshes every 2 seconds
     </footer>
@@ -211,20 +203,27 @@
   </main>
 
 
-  <!-- CELEBRATION MESSAGE -->
+  <!-- CELEBRATION NOTIFICATION -->
   <aside
     id="celebration"
     class="celebration"
     aria-live="assertive"
   >
-    <strong>🎉 Contract Won!</strong>
-    <span>The shared total has been updated.</span>
+    <strong>🎉 LET'S GO!</strong>
+    <span>Another win for the team!</span>
   </aside>
 
 
-  <!-- EXISTING JAVASCRIPT -->
+  <!--
+    app.js handles:
+    - Live totals
+    - Countdown
+    - Progress
+    - Shared celebration event
+    - Fireworks
+  -->
   <script
-    src="./app.js?v=public-2"
+    src="./app.js?v=public-3"
     type="module"
   ></script>
 
