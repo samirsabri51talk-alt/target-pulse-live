@@ -1,5 +1,5 @@
 import { config } from './config.js';
-const TARGET = 165;
+let TARGET = 165;
 const $ = id => document.getElementById(id);
 const cloud = Boolean(config.supabaseUrl && config.publishableKey);
 const local = ['localhost', '127.0.0.1'].includes(location.hostname);
@@ -7,7 +7,7 @@ let busy = false, reading = false, remaining = null, newest = 0, toastTimer, req
 const formatter = new Intl.DateTimeFormat(undefined, { hour: 'numeric', minute: '2-digit', second: '2-digit' });
 
 async function api(write = false) {
-  const path = write ? '/rest/v1/rpc/target_pulse_record_win' : '/rest/v1/target_pulse_counter?id=eq.1&select=remaining,updated_at';
+  const path = write ? '/rest/v1/rpc/target_pulse_record_win' : '/rest/v1/target_pulse_counter?id=eq.1&select=*';
   const url = cloud ? config.supabaseUrl + path : write ? '/api/orders/decrement' : '/api/state';
   const headers = cloud ? { apikey: config.publishableKey } : {};
   const options = { headers, cache: 'no-store', signal: AbortSignal.timeout(8000) };
@@ -20,14 +20,16 @@ async function api(write = false) {
   const payload = await response.json();
   const state = cloud ? payload[0] : payload;
   const timestamp = Date.parse(state?.updated_at || state?.updatedAt);
-  if (!state || !Number.isInteger(state.remaining) || state.remaining < 0 || state.remaining > TARGET || !Number.isFinite(timestamp)) throw new Error('The live service returned invalid data.');
+  const target = state?.target ?? 165;
+  if (!state || !Number.isInteger(target) || target < 1 || !Number.isInteger(state.remaining) || state.remaining < 0 || state.remaining > target || !Number.isFinite(timestamp)) throw new Error('The live service returned invalid data.');
   if (timestamp >= newest) {
-    newest = timestamp; remaining = state.remaining;
+    newest = timestamp; remaining = state.remaining; TARGET = target;
     const completed = TARGET - remaining;
     $('remaining').textContent = remaining;
     $('orders-ar').textContent = remaining;
     $('progress-fill').style.width = `${completed / TARGET * 100}%`;
     document.querySelector('[role="progressbar"]').setAttribute('aria-valuenow', String(completed));
+    document.querySelector('[role="progressbar"]').setAttribute('aria-valuemax', String(TARGET));
     $('progress-copy').textContent = remaining === 0 ? 'Target reached — incredible work, team!' : `${completed} of ${TARGET} contracts · ${Math.round(completed / TARGET * 100)}% complete`;
     $('updated-time').textContent = `Updated ${formatter.format(timestamp)}`;
   }
@@ -83,7 +85,7 @@ document.addEventListener('visibilitychange', () => { if (!document.hidden) { sy
 // Keep the original quick keyboard controls, with local-only adjustment until a cloud counter is configured.
 document.addEventListener('keydown', event => {
   if (event.target instanceof HTMLInputElement || event.target instanceof HTMLTextAreaElement) return;
-  if (event.key === 'ArrowDown' || event.key === 'ArrowUp') {
+  if (!cloud && (event.key === 'ArrowDown' || event.key === 'ArrowUp')) {
     event.preventDefault();
     if (remaining === null) return;
     remaining = Math.max(0, remaining + (event.key === 'ArrowUp' ? 1 : -1));
