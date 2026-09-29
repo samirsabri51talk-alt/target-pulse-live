@@ -1,1 +1,13 @@
 .brand{gap:12px}.brand img{width:112px;height:auto;display:block;border-radius:4px}.brand-word{font-size:.72rem;color:var(--gold-soft);letter-spacing:.2em}.mascot{object-fit:contain;right:2%;bottom:20px;width:128px;height:128px;filter:drop-shadow(0 16px 14px rgba(0,0,0,.45));animation:mascotFloat 3.5s ease-in-out infinite}.mascot.celebrate{animation:mascotCelebrate 1.2s ease-in-out 3}@keyframes mascotFloat{0%,100%{transform:translateY(0) rotate(-2deg)}50%{transform:translateY(-9px) rotate(2deg)}}@keyframes mascotCelebrate{0%,100%{transform:translateY(0) rotate(0) scale(1)}30%{transform:translateY(-24px) rotate(-9deg) scale(1.08)}60%{transform:translateY(0) rotate(9deg) scale(1.03)}}@media(max-width:720px){.brand img{width:90px}.brand-word{display:none}.mascot{width:92px;height:92px;right:0;bottom:28px}}
+.target-achieved .hero{margin:auto 0;padding-top:70px;padding-bottom:60px}
+.target-achieved .hero h1{color:var(--gold-soft)}
+.target-achieved .number-wrap{flex-direction:column;align-items:center;gap:30px;margin:35px 0}
+.target-achieved .big-number{font-size:clamp(6rem,18vw,13rem);letter-spacing:-.07em}
+.target-achieved .number-caption{font-size:clamp(1.1rem,3vw,2rem);letter-spacing:0;color:var(--white)}
+.target-achieved .lower-grid,.target-achieved #preview-fireworks{display:none}
+.target-achieved .mascot{bottom:50px}
+.target-achieved .progress-copy{color:var(--gold-soft)}
+@media(max-width:720px){.target-achieved .mascot{position:relative;right:auto;bottom:auto;margin:5px auto 25px;width:100px;height:100px;display:block}}
+#fx{z-index:1}
+.stage{z-index:2}
+/* Fireworks fill the open layout, behind the lettering and between words. */

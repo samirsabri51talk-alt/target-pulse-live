@@ -19,17 +19,17 @@ function preview() {
   $('preview').textContent = `${$('completed').value} completed · ${$('to-go').value} to go · target ${$('target').value}`;
 }
 function render(state) {
-  revision = state.updated_at; $('target').value = state.target; $('to-go').value = state.remaining; $('completed').value = state.target - state.remaining; preview();
+  revision = state.updated_at; $('target').value = state.target; $('to-go').value = state.remaining; $('completed').value = state.target - state.remaining; $('force-achieved').checked = state.force_achieved === true; preview();
   $('saved-at').textContent = `Last saved: ${new Date(state.updated_at).toLocaleString()}`;
 }
-async function load() { const rows = await request('/rest/v1/target_pulse_counter?id=eq.1&select=target,remaining,updated_at'); if(!rows[0]) throw new Error('Counter unavailable.'); render(rows[0]); }
+async function load() { const rows = await request('/rest/v1/target_pulse_counter?id=eq.1&select=*'); if(!rows[0]) throw new Error('Counter unavailable.'); render(rows[0]); }
 $('target').addEventListener('input',()=>{ $('completed').value = Math.min(Number($('completed').value),Math.max(0,Number($('target').value))); $('to-go').value = Number($('target').value)-Number($('completed').value); preview(); });
 $('completed').addEventListener('input',()=>{ $('to-go').value = Number($('target').value)-Number($('completed').value); preview(); });
 $('to-go').addEventListener('input',()=>{ $('completed').value = Number($('target').value)-Number($('to-go').value); preview(); });
 $('settings').addEventListener('submit', e=>{e.preventDefault();action(async()=>{
   const target = Number($('target').value), remaining = Number($('to-go').value);
   if(!Number.isInteger(target)||!Number.isInteger(remaining)||target<1||target>1000000||remaining<0||remaining>target) throw new Error('Enter whole numbers, with contracts to go between zero and the target.');
-  const rows = await request('/rest/v1/rpc/target_pulse_admin_set',{p_target:target,p_remaining:remaining,p_expected_updated_at:revision});
+  const rows = await request('/rest/v1/rpc/target_pulse_admin_save',{p_target:target,p_remaining:remaining,p_force_achieved:$('force-achieved').checked,p_expected_updated_at:revision});
   render(rows[0]); $('status').textContent='Saved. The live dashboard will update within 2 seconds.';
 });});
 $('reload').addEventListener('click',()=>action(async()=>{await load();$('status').textContent='Current values loaded.';}));

@@ -1,27 +1,217 @@
 <!doctype html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-  <meta name="theme-color" content="#06133b"><title>51Talk · Target Celebration</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Manrope:wght@500;600;700;800&display=swap" rel="stylesheet"><link rel="stylesheet" href="styles.css"><link rel="stylesheet" href="brand-overrides.css">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <meta name="theme-color" content="#06133b">
+  <title>51Talk · Target Celebration</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+
+  <link
+    href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Manrope:wght@500;600;700;800&display=swap"
+    rel="stylesheet"
+  >
+
+  <link rel="stylesheet" href="./styles.css">
+  <link rel="stylesheet" href="./brand-overrides.css?v=live-celebrations-7">
 </head>
+
 <body>
+
+  <!-- Fireworks canvas -->
   <canvas id="fx" aria-hidden="true"></canvas>
+
   <main class="stage">
-    <header class="header-row"><a class="brand" href="./"><img src="logo.png" alt="51Talk"><span class="brand-word">TARGET PULSE</span></a><div class="badge">ONE TEAM · ONE GOAL</div><div class="live-status"><span class="live-dot"></span><span id="sync-label">LIVE · syncing</span></div></header>
+
+    <!-- HEADER -->
+    <header class="header-row">
+
+      <a class="brand" href="./">
+        <img src="./logo.png" alt="51Talk">
+        <span class="brand-word">TARGET PULSE</span>
+      </a>
+
+      <div class="badge">
+        ONE TEAM · ONE GOAL
+      </div>
+
+      <div class="live-status">
+        <span class="live-dot"></span>
+        <span id="sync-label">LIVE · syncing</span>
+      </div>
+
+    </header>
+
+
+    <!-- HERO -->
     <section class="hero" aria-labelledby="title">
-      <p class="hero-label">TODAY'S TARGET · 100%</p><h1 id="title">Every win moves<br><em>the team forward.</em></h1>
-      <div class="number-wrap"><span id="remaining" class="big-number" aria-live="polite">—</span><span class="number-caption">CONTRACTS TO GO</span></div>
-      <img class="mascot" src="mascot.png" alt="" aria-hidden="true">
-      <div class="progress-track" role="progressbar" aria-label="Target progress" aria-valuemin="0" aria-valuemax="165" aria-valuenow="0"><span id="progress-fill"></span></div><p id="progress-copy" class="progress-copy">Preparing the live total…</p>
+
+      <p class="hero-label">
+        TODAY'S TARGET · 100%
+      </p>
+
+      <h1 id="title">
+        Every win moves<br>
+        <em>the team forward.</em>
+      </h1>
+
+      <div class="number-wrap">
+        <span
+          id="remaining"
+          class="big-number"
+          aria-live="polite"
+        >—</span>
+
+        <span class="number-caption">
+          CONTRACTS TO GO
+        </span>
+      </div>
+
+      <img
+        class="mascot"
+        src="./mascot.png"
+        alt=""
+        aria-hidden="true"
+      >
+
+      <div
+        class="progress-track"
+        role="progressbar"
+        aria-label="Target progress"
+        aria-valuemin="0"
+        aria-valuemax="165"
+        aria-valuenow="0"
+      >
+        <span id="progress-fill"></span>
+      </div>
+
+      <p
+        id="progress-copy"
+        class="progress-copy"
+      >
+        Preparing the live total…
+      </p>
+
     </section>
+
+
+    <!-- LOWER SECTION -->
     <section class="lower-grid">
-      <div class="panel countdown-panel"><div class="panel-label">TIME LEFT TODAY <span id="updated-time">Loading…</span></div><div class="countdown-box"><div><strong id="hours">00</strong><small>HOURS</small></div><i>:</i><div><strong id="minutes">00</strong><small>MINUTES</small></div><i>:</i><div><strong id="seconds">00</strong><small>SECONDS</small></div></div><p class="window-note">🕛 12:00 PM → 11:59 PM · TODAY</p></div>
-      <div class="panel action-panel"><p class="arabic" dir="rtl">متبقي <strong id="orders-ar">—</strong> طلبًا للوصول إلى 100%</p><button id="win-button" class="win-button" type="button" disabled>🏆 We Got a Contract!</button><p id="request-status" class="request-status" role="status"></p><p class="hint">Space / Enter / button = contract won</p></div>
+
+      <!-- COUNTDOWN -->
+      <div class="panel countdown-panel">
+
+        <div class="panel-label">
+          TIME LEFT TODAY
+          <span id="updated-time">
+            Loading…
+          </span>
+        </div>
+
+        <div class="countdown-box">
+
+          <div>
+            <strong id="hours">00</strong>
+            <small>HOURS</small>
+          </div>
+
+          <i>:</i>
+
+          <div>
+            <strong id="minutes">00</strong>
+            <small>MINUTES</small>
+          </div>
+
+          <i>:</i>
+
+          <div>
+            <strong id="seconds">00</strong>
+            <small>SECONDS</small>
+          </div>
+
+        </div>
+
+        <p class="window-note">
+          🕛 12:00 PM → 11:59 PM · TODAY
+        </p>
+
+      </div>
+
+
+      <!-- TARGET STATUS -->
+      <div class="panel action-panel">
+
+        <p class="arabic" dir="rtl">
+          متبقي
+          <strong id="orders-ar">—</strong>
+          طلبًا للوصول إلى 100%
+        </p>
+
+        <p
+          id="request-status"
+          class="request-status"
+          role="status"
+        ></p>
+
+        <p class="hint">
+          Every contract counts. Let's reach the goal together.
+        </p>
+
+      </div>
+
     </section>
-    <div style="text-align:center;margin-top:18px"><button id="preview-fireworks" type="button" style="background:transparent;color:var(--gold-soft);border:1px solid var(--line);border-radius:20px;padding:10px 18px;cursor:pointer">✨ Preview fireworks</button></div><footer>Live data refreshes every 2 seconds <span>·</span> <a href="admin.html" style="color:var(--gold-soft)">Admin panel</a></footer>
+
+
+    <!-- FIREWORKS PREVIEW -->
+    <div class="effect-controls" style="text-align:center; margin-top:18px;">
+
+      <button
+        id="preview-fireworks"
+        type="button"
+        style="
+          background:transparent;
+          color:var(--gold-soft);
+          border:1px solid var(--line);
+          border-radius:20px;
+          padding:10px 18px;
+          cursor:pointer;
+        "
+      >
+        ✨ Preview fireworks
+      </button>
+      <button id="sound-toggle" type="button" aria-pressed="false" style="background:transparent;color:var(--gold-soft);border:1px solid var(--line);border-radius:20px;padding:10px 18px;cursor:pointer">🔇 Enable sound</button>
+      <span id="sound-status" role="status" style="display:block;font-size:.75rem;color:var(--muted);margin-top:8px"></span>
+
+    </div>
+
+
+    <!-- FOOTER -->
+    <footer>
+      Live data refreshes every 2 seconds
+    </footer>
+
   </main>
-  <aside id="celebration" class="celebration" aria-live="assertive"><strong>🎉 Contract Won!</strong><span>The shared total has been updated.</span></aside>
-  <script src="app.js?v=public-2" type="module"></script>
-</body></html>
+
+
+  <!-- CELEBRATION MESSAGE -->
+  <aside
+    id="celebration"
+    class="celebration"
+    aria-live="assertive"
+  >
+    <strong>🎉 Contract Won!</strong>
+    <span>The shared total has been updated.</span>
+  </aside>
+
+
+  <!-- EXISTING JAVASCRIPT -->
+  <script
+    src="./app.js?v=live-celebrations-7"
+    type="module"
+  ></script>
+
+</body>
+</html>

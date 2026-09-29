@@ -1,0 +1,14 @@
+begin;
+alter table public.target_pulse_counter add column if not exists force_achieved boolean not null default false;
+create or replace function public.target_pulse_admin_save(p_target integer, p_remaining integer, p_force_achieved boolean, p_expected_updated_at timestamptz)
+returns setof public.target_pulse_counter language plpgsql security definer set search_path = '' as $$
+begin
+  if p_target is null or p_remaining is null or p_force_achieved is null or p_target < 1 or p_target > 1000000 or p_remaining < 0 or p_remaining > p_target then raise exception 'Invalid counter settings'; end if;
+  perform 1 from public.target_pulse_counter where id = 1 for update;
+  if p_expected_updated_at is null or not exists(select 1 from public.target_pulse_counter where id = 1 and updated_at = p_expected_updated_at) then raise exception 'The count changed. Reload current values before saving.' using errcode = '40001'; end if;
+  update public.target_pulse_counter set target = p_target, remaining = p_remaining, force_achieved = p_force_achieved, updated_at = clock_timestamp() where id = 1;
+  return query select * from public.target_pulse_counter where id = 1;
+end; $$;
+revoke all on function public.target_pulse_admin_save(integer, integer, boolean, timestamptz) from public;
+grant execute on function public.target_pulse_admin_save(integer, integer, boolean, timestamptz) to anon, authenticated;
+commit;
