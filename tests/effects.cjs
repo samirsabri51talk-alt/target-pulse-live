@@ -10,6 +10,7 @@ for (const height of [600,1080,2160]) {
   const element=id=>{ if(!elements.has(id)) elements.set(id,{textContent:'',style:{},classList:{add:noop,remove:noop},setAttribute:noop,addEventListener:noop,getContext:()=>context}); return elements.get(id); };
   const sandbox={document:{getElementById:element,querySelector:element,addEventListener:noop},location:{hostname:'example.com'},window:{addEventListener:noop},innerWidth:1920,innerHeight:height,Intl,Date,Math,AbortSignal,HTMLInputElement:class{},HTMLTextAreaElement:class{},matchMedia:()=>({matches:false}),setTimeout:fn=>{fn();return 1;},clearTimeout:noop,setInterval:noop,addEventListener:noop,requestAnimationFrame:fn=>frame=fn};
   sandbox.document.querySelectorAll = () => [];
+  sandbox.setTimeout=(fn,ms)=>{if(ms<5000)fn();return 1};
   vm.createContext(sandbox); vm.runInContext(source,sandbox); vm.runInContext('launchFireworks()',sandbox);
   for(let i=0;i<700;i++)frame();
   assert(strokes>10000,`No full bursts at height ${height}`);
@@ -29,7 +30,7 @@ for (const height of [600,1080,2160]) {
   const param = {setValueAtTime:noop,linearRampToValueAtTime:noop,exponentialRampToValueAtTime:noop};
   const audioNode = () => ({connect:noop,disconnect:noop,start:()=>starts++,stop:noop,gain:{...param},frequency:{...param},pan:{value:0}});
   sandbox.testAudio = {state:'running',currentTime:1,createStereoPanner:audioNode,createBufferSource:audioNode,createBiquadFilter:audioNode,createGain:audioNode,createOscillator:audioNode};
-  vm.runInContext('audioContext=testAudio;audioMaster={};fireworksBuffer={duration:2};cheeringBuffer={duration:17};soundEnabled=true;playFireworkSound(.2);playFireworkSound(.8)',sandbox);
+  vm.runInContext('audioContext=testAudio;audioMaster={};fireworksBuffer={duration:2};cheeringBuffer={duration:17};soundEnabled=true;contractSoundUntil=Date.now()+5000;playFireworkSound(.2);playFireworkSound(.8)',sandbox);
   assert.equal(starts,2,'Only one fireworks/cheering pair within throttle window');
   sandbox.testAudio.currentTime=2; sandbox.document.hidden=true;
   vm.runInContext('playFireworkSound(.5)',sandbox);

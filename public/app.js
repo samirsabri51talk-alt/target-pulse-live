@@ -5,6 +5,9 @@ const cloud = Boolean(config.supabaseUrl && config.publishableKey);
 const local = ['localhost', '127.0.0.1'].includes(location.hostname);
 let busy = false, reading = false, remaining = null, newest = 0, toastTimer, requestId;
 let achieved = false, finaleElapsed = 0;
+const CONTRACT_CELEBRATION_MS = 5000;
+let contractSoundUntil = 0, soundStopTimer;
+const activeSounds = new Set();
 const previewAchieved = local && new URLSearchParams(location.search).get('preview') === 'achieved';
 const formatter = new Intl.DateTimeFormat(undefined, { hour: 'numeric', minute: '2-digit', second: '2-digit' });
 
@@ -36,7 +39,7 @@ async function api(write = false) {
     document.querySelector('[role="progressbar"]').setAttribute('aria-valuemax', String(TARGET));
     $('progress-copy').textContent = achieved ? 'Together, we made it happen.' : `${completed} of ${TARGET} contracts · ${Math.round(completed / TARGET * 100)}% complete`;
     $('updated-time').textContent = `Updated ${formatter.format(timestamp)}`;
-    if (celebrateRemote && !achieved) celebrate();
+    if (celebrateRemote) celebrate();
   }
   $('sync-label').textContent = 'LIVE · synced';
   document.querySelector('.live-dot').style.background = 'var(--cyan)';
@@ -116,7 +119,7 @@ soundButton?.addEventListener('click', async () => {
     soundButton.textContent = soundEnabled ? '🔊 Mute sound' : '🔇 Enable sound';
     soundButton.setAttribute('aria-pressed', String(soundEnabled));
     $('sound-status').textContent = '';
-    if (soundEnabled) playFireworkSound(.5);
+    if (!soundEnabled) stopContractSound();
   } catch {
     soundEnabled = false;
     if (audioMaster) audioMaster.gain.value = 0;
@@ -126,26 +129,36 @@ soundButton?.addEventListener('click', async () => {
   } finally { soundButton.disabled = false; }
 });
 document.addEventListener('visibilitychange', () => {
+  if (document.hidden) stopContractSound();
   if (!audioContext || !audioMaster) return;
   audioMaster.gain.cancelScheduledValues(audioContext.currentTime);
   audioMaster.gain.setTargetAtTime(soundEnabled && !document.hidden ? .5 : 0, audioContext.currentTime, .04);
 });
+function stopContractSound() {
+  contractSoundUntil = 0;
+  clearTimeout(soundStopTimer);
+  for (const source of activeSounds) { try { source.stop(); } catch {} }
+  activeSounds.clear();
+}
 function playRecording(buffer, volume, position) {
   const now = audioContext.currentTime;
+  const duration = Math.min(buffer.duration, (contractSoundUntil - Date.now()) / 1000);
+  if (duration < .15) return;
   const source = audioContext.createBufferSource(); source.buffer = buffer;
   const gain = audioContext.createGain();
   gain.gain.setValueAtTime(0, now);
   gain.gain.linearRampToValueAtTime(volume, now + .12);
-  gain.gain.setValueAtTime(volume, now + Math.max(.12, buffer.duration - .8));
-  gain.gain.linearRampToValueAtTime(0, now + buffer.duration);
+  gain.gain.setValueAtTime(volume, now + Math.max(.12, duration - .5));
+  gain.gain.linearRampToValueAtTime(0, now + duration);
   const pan = audioContext.createStereoPanner();
   pan.pan.value = Math.max(-.45, Math.min(.45, (position - .5) * .9));
   source.connect(gain); gain.connect(pan); pan.connect(audioMaster);
-  source.onended = () => { source.disconnect(); gain.disconnect(); pan.disconnect(); };
-  source.start(now); source.stop(now + buffer.duration);
+  source.onended = () => { activeSounds.delete(source); source.disconnect(); gain.disconnect(); pan.disconnect(); };
+  activeSounds.add(source);
+  source.start(now); source.stop(now + duration);
 }
 function playFireworkSound(position) {
-  if (!soundEnabled || document.hidden || audioContext?.state !== 'running' || !fireworksBuffer || !cheeringBuffer) return;
+  if (Date.now() >= contractSoundUntil || !soundEnabled || document.hidden || audioContext?.state !== 'running' || !fireworksBuffer || !cheeringBuffer) return;
   const now = audioContext.currentTime;
   if (now - lastSound >= fireworksBuffer.duration + .4) {
     lastSound = now;
@@ -159,6 +172,7 @@ function playFireworkSound(position) {
 
 const canvas = $('fx'), context = canvas.getContext('2d'); let particles = [], rockets = [];
 let fireworksUntil = 0;
+let effectGeneration = 0, effectStopTimer;
 let shellSequence = 0;
 function edgeShell(grand = false) {
   const lane = shellSequence++ % 4;
@@ -167,19 +181,35 @@ function edgeShell(grand = false) {
     color: ['#ffd84d', '#ffe8aa', '#75cfff', '#c5b7ef'][Math.floor(Math.random() * 4)], ring: Math.random() < .3, grand };
 }
 function resizeCanvas() { canvas.width = innerWidth; canvas.height = innerHeight; }
+function stopContractVisuals() {
+  effectGeneration++;
+  fireworksUntil = 0;
+  if (!achieved) {
+    rockets = []; particles = [];
+    context.clearRect(0, 0, canvas.width, canvas.height);
+  }
+}
 function launchFireworks() {
-  if (matchMedia('(prefers-reduced-motion: reduce)').matches || Date.now() < fireworksUntil) return;
-  fireworksUntil = Date.now() + 8000;
+  if (matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+  clearTimeout(effectStopTimer);
+  const generation = ++effectGeneration;
+  fireworksUntil = Date.now() + CONTRACT_CELEBRATION_MS;
+  effectStopTimer = setTimeout(stopContractVisuals, CONTRACT_CELEBRATION_MS);
   // Dense overlapping shells across the full screen for every contract.
   for (let burst = 0; burst < 36; burst++) setTimeout(() => {
-    if (achieved || document.hidden || matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+    if (generation !== effectGeneration || Date.now() >= fireworksUntil || achieved || document.hidden || matchMedia('(prefers-reduced-motion: reduce)').matches) return;
     if (rockets.length < 40) rockets.push(edgeShell(true));
-  }, burst * 125);
+  }, burst * 60);
 }
 function celebrate() {
+  stopContractSound();
+  contractSoundUntil = Date.now() + CONTRACT_CELEBRATION_MS;
+  lastSound = -Infinity; nextCheer = 0;
+  soundStopTimer = setTimeout(stopContractSound, CONTRACT_CELEBRATION_MS);
+  if (achieved) return; // Keep the achievement visuals continuous, but audio lasts only five seconds.
   $('celebration').classList.add('show'); clearTimeout(toastTimer);
   document.querySelector('.mascot')?.classList.add('celebrate');
-  toastTimer = setTimeout(() => { $('celebration').classList.remove('show'); document.querySelector('.mascot')?.classList.remove('celebrate'); }, 3600);
+  toastTimer = setTimeout(() => { $('celebration').classList.remove('show'); document.querySelector('.mascot')?.classList.remove('celebrate'); }, CONTRACT_CELEBRATION_MS);
   launchFireworks();
 }
 $('preview-fireworks')?.addEventListener('click', () => { launchFireworks(); document.querySelector('.mascot')?.classList.add('celebrate'); setTimeout(()=>document.querySelector('.mascot')?.classList.remove('celebrate'),3600); });
@@ -198,6 +228,7 @@ let previousFrame;
 function animate(now) {
   const dt = previousFrame === undefined || !Number.isFinite(now) ? 1 : Math.min(2, (now - previousFrame) / 16.667);
   previousFrame = now;
+  if (!achieved && fireworksUntil && Date.now() >= fireworksUntil) stopContractVisuals();
   if (achieved && !document.hidden && !matchMedia('(prefers-reduced-motion: reduce)').matches) {
     finaleElapsed += dt;
     if (finaleElapsed >= 12) {
