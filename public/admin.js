@@ -27,7 +27,7 @@ $('send-code').addEventListener('submit', e => { e.preventDefault(); action(asyn
   await request('/auth/v1/otp', {email:$('email').value.trim(),create_user:true});
   $('status').textContent = 'Check your email and open the one-time sign-in link. It will bring you back here.';
 }); });
-$('target').addEventListener('input',()=>{ $('to-go').value = Math.max(0,Number($('target').value)-Number($('completed').value)); preview(); });
+$('target').addEventListener('input',()=>{ $('completed').value = Math.min(Number($('completed').value),Math.max(0,Number($('target').value))); $('to-go').value = Number($('target').value)-Number($('completed').value); preview(); });
 $('completed').addEventListener('input',()=>{ $('to-go').value = Number($('target').value)-Number($('completed').value); preview(); });
 $('to-go').addEventListener('input',()=>{ $('completed').value = Number($('target').value)-Number($('to-go').value); preview(); });
 $('settings').addEventListener('submit', e=>{e.preventDefault();action(async()=>{
