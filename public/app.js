@@ -82,7 +82,7 @@ document.addEventListener('visibilitychange', () => { if (!document.hidden) { sy
 
 // Keep the original quick keyboard controls, with local-only adjustment until a cloud counter is configured.
 document.addEventListener('keydown', event => {
-  if (event.target instanceof HTMLInputElement || event.target instanceof HTMLTextAreaElement) return;
+  if (event.repeat || event.target.closest?.('input,textarea,select,button,a,[contenteditable="true"]')) return;
   if (!cloud && (event.key === 'ArrowDown' || event.key === 'ArrowUp')) {
     event.preventDefault();
     if (remaining === null) return;
