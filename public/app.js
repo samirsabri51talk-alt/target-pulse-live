@@ -6,6 +6,8 @@ const local = ['localhost', '127.0.0.1'].includes(location.hostname);
 let busy = false, reading = false, remaining = null, newest = 0, toastTimer, requestId;
 let achieved = false, finaleElapsed = 0;
 const CONTRACT_CELEBRATION_MS = 5000;
+// 31 October 2026, 11 PM Africa/Cairo (UTC+02:00 after the DST transition).
+const COUNTDOWN_END = Date.parse('2026-10-31T23:00:00+02:00');
 let contractSoundUntil = 0, soundStopTimer;
 const activeSounds = new Set();
 const previewAchieved = local && new URLSearchParams(location.search).get('preview') === 'achieved';
@@ -56,8 +58,7 @@ async function sync() {
   } finally { reading = false; }
 }
 function clock() {
-  const now = new Date(), midnight = new Date(now); midnight.setHours(24, 0, 0, 0);
-  const seconds = Math.max(0, Math.floor((midnight - now) / 1000));
+  const seconds = Math.max(0, Math.floor((COUNTDOWN_END - Date.now()) / 1000));
   [Math.floor(seconds / 3600), Math.floor(seconds % 3600 / 60), seconds % 60].forEach((v, i) => {
     $(['hours', 'minutes', 'seconds'][i]).textContent = String(v).padStart(2, '0');
   });
@@ -80,7 +81,7 @@ function setAchieved(value) {
   achieved = value;
   document.body.classList.toggle('target-achieved', value);
   $('title').innerHTML = value ? 'Target Achieved' : 'Every win moves<br><em>the team forward.</em>';
-  document.querySelector('.hero-label').textContent = value ? 'ONE TEAM · ONE INCREDIBLE ACHIEVEMENT' : "TODAY'S TARGET · 100%";
+  document.querySelector('.hero-label').textContent = value ? 'ONE TEAM · ONE INCREDIBLE ACHIEVEMENT' : 'TEAM TARGET · 100%';
   $('remaining').textContent = value ? '100%' : remaining;
   document.querySelector('.number-caption').textContent = value ? 'Thanks for your hardwork' : 'CONTRACTS TO GO';
   clearTimeout(toastTimer); $('celebration').classList.remove('show');
