@@ -27,7 +27,7 @@ async function poll() {
   loading=true;
   try {await rpc('target_pulse_draw_state');}
   catch(e){error='Connection interrupted. Reconnecting…';render();}
-  finally{loading=false;}
+  finally{loading=false;render();}
 }
 function celebrate() {
   const box=overlay.querySelector('.draw-confetti'); box.replaceChildren();
