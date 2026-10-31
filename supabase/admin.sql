@@ -18,7 +18,7 @@ begin
   end if;
   perform 1 from public.target_pulse_counter where id = 1 for update;
   if p_expected_updated_at is null or not exists(select 1 from public.target_pulse_counter where id = 1 and updated_at = p_expected_updated_at) then
-    raise exception 'The count changed. Reload current values before saving.' using errcode = '40001';
+    raise exception 'The count changed. Reload current values before saving.' using errcode = 'P0001';
   end if;
   update public.target_pulse_counter set target = p_target, remaining = p_remaining, updated_at = clock_timestamp() where id = 1;
   return query select * from public.target_pulse_counter where id = 1;

@@ -9,10 +9,10 @@ async function request(path, body) {
 }
 async function action(fn) {
   if (locked) return; locked = true;
-  document.querySelectorAll('button').forEach(b => b.disabled = true);
+  document.querySelectorAll('#controls button').forEach(b => b.disabled = true);
   $('status').textContent = 'Working…';
   try { await fn(); } catch(e) { $('status').textContent = e.message; }
-  finally { locked = false; document.querySelectorAll('button').forEach(b => b.disabled = false); }
+  finally { locked = false; document.querySelectorAll('#controls button').forEach(b => b.disabled = false); }
 }
 function preview() {
   $('completed').max = $('target').value; $('to-go').max = $('target').value;
